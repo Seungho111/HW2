@@ -3,230 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chinese Tutor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>ChatGPT-style AI Tutor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #090910 0%, #171822 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --primary: #6c5ce7;
-            --primary-hover: #8073ea;
-            --text-main: #f0f0f0;
-            --text-muted: #a0a0a5;
-            --bot-bg: rgba(255, 255, 255, 0.08);
-            --error-color: #ff6b6b;
-        }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .container {
-            width: 100%;
-            max-width: 680px;
-            height: 85vh;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            position: relative;
-        }
-        .header {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px dashed var(--glass-border);
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            color: #fff;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px rgba(108, 92, 231, 0.7);
-        }
-        .header span {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
-            display: block;
-        }
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .chat-box::-webkit-scrollbar { width: 6px; }
-        .chat-box::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 6px; }
-        
-        .message {
-            max-width: 82%;
-            padding: 14px 20px;
-            border-radius: 20px;
-            line-height: 1.6;
-            font-size: 0.95rem;
-            opacity: 0;
-            transform: translateY(15px);
-            animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            word-wrap: break-word;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        @keyframes slideUpFade {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-message {
-            align-self: flex-end;
-            background: var(--primary);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-        .bot-message {
-            align-self: flex-start;
-            background: var(--bot-bg);
-            border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-        }
-        .input-group {
-            display: flex;
-            margin-top: 20px;
-            gap: 12px;
-            position: relative;
-        }
-        input {
-            flex: 1;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--glass-border);
-            padding: 16px 24px;
-            border-radius: 30px;
-            color: var(--text-main);
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
-        }
-        button {
-            background: var(--primary);
-            border: none;
-            color: white;
-            padding: 0 30px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
-        button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
-        }
-        button:active {
-            transform: translateY(1px);
-        }
-        .typing {
-            align-self: flex-start;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            margin-top: 5px;
-            margin-bottom: 5px;
-            display: none;
-            background: var(--bot-bg);
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-        }
-        .typing span {
-            display: inline-block;
-            width: 5px;
-            height: 5px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .typing span:nth-child(1) { animation-delay: -0.32s; }
-        .typing span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #343541; color: #d1d5db; }
+        .app-container { display: flex; height: 100vh; }
+        .sidebar { width: 260px; background-color: #202123; padding: 8px; display: flex; flex-direction: column; }
+        .new-chat-btn { border: 1px solid #4d4d4f; background: transparent; color: white; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: 0.2s; }
+        .new-chat-btn:hover { background-color: #2A2B32; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .messages { flex: 1; overflow-y: auto; padding-bottom: 140px; }
+        .message-row { display: flex; padding: 24px; justify-content: center; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .bot { background-color: #444654; }
+        .msg-content { max-width: 768px; width: 100%; display: flex; gap: 24px; line-height: 1.7; font-size: 15px; }
+        .avatar { width: 30px; height: 30px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; flex-shrink: 0; }
+        .avatar-user { background-color: #10a37f; }
+        .avatar-bot { background-color: #10a37f; }
+        .input-area { position: absolute; bottom: 0; width: 100%; display: flex; justify-content: center; background: linear-gradient(180deg, rgba(53,55,64,0), #343541 40%); padding: 30px 0; }
+        .input-box { width: 100%; max-width: 768px; position: relative; background-color: #40414f; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .input-wrapper { display: flex; padding: 4px; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 14px; font-size: 1rem; outline: none; }
+        .input-wrapper button { background: transparent; border: none; color: #8e8ea0; padding: 10px 15px; cursor: pointer; transition: 0.3s; margin-right: 4px; border-radius: 6px; }
+        .input-wrapper button:hover { background: #10a37f; color: white; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>AI Tutor</h1>
-            <span>FastAPI Powered Intelligent Assistant</span>
+    <div class="app-container">
+        <div class="sidebar">
+            <button class="new-chat-btn" onclick="clearChat()"><i class="fas fa-plus"></i> 새 대화하기</button>
         </div>
-        <div class="chat-box" id="chatBox">
-            <div class="message bot-message">안녕하세요! 중국어 문법에 대해 질문해주세요.</div>
-        </div>
-        <div class="typing" id="typing">
-            <span></span><span></span><span></span>
-        </div>
-        <div class="input-group">
-            <input type="text" id="userInput" placeholder="대화를 입력하세요..." onkeypress="handleEnter(event)">
-            <button id="sendBtn" onclick="sendMessage()">전송</button>
+        <div class="chat-area">
+            <div class="messages" id="chatBox">
+                <div class="message-row bot">
+                    <div class="msg-content">
+                        <div class="avatar avatar-bot"><i class="fas fa-bolt"></i></div>
+                        <div>안녕하세요! MLOps 지식 확장 업데이트가 적용된 중국어 문법 튜터입니다. 질문해 주시면 관련된 심화 문법까지 이어서 알려드립니다.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-area">
+                <div class="input-box">
+                    <div class="input-wrapper">
+                        <input type="text" id="userInput" placeholder="질문을 입력하세요..." onkeypress="handleEnter(event)">
+                        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
-        const typing = document.getElementById('typing');
-        const sendBtn = document.getElementById('sendBtn');
 
-        function appendMessage(text, sender) {
-            const msgObj = document.createElement('div');
-            msgObj.classList.add('message');
-            msgObj.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-            msgObj.innerHTML = text.replace(/\n/g, '<br>');
-            chatBox.appendChild(msgObj);
-            scrollToBottom();
+        function clearChat() {
+            /* simplified reset */
+            location.reload(); 
         }
 
-        function scrollToBottom() {
-            setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50);
+        function createMessageElement(text, isUser) {
+            const row = document.createElement('div');
+            row.className = 'message-row' + (isUser ? '' : ' bot');
+            
+            // basic line jump to handle LLM newlines correctly
+            row.innerHTML = `
+                <div class="msg-content">
+                    <div class="avatar ${isUser ? 'avatar-user' : 'avatar-bot'}"><i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i></div>
+                    <div>${text.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+            return row;
         }
 
         async function sendMessage() {
             const text = userInput.value.trim();
             if(!text) return;
             
-            appendMessage(text, 'user');
+            chatBox.appendChild(createMessageElement(text, true));
             userInput.value = '';
-            typing.style.display = 'block';
-            chatBox.appendChild(typing); // move indicator to bottom
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-            scrollToBottom();
+            
+            const loadingRow = document.createElement('div');
+            loadingRow.className = 'message-row bot loading-indicator';
+            loadingRow.innerHTML = '<div class="msg-content"><div class="avatar avatar-bot"><i class="fas fa-spinner fa-spin"></i></div><div>지식을 분석하고 심화 확장 중입니다...</div></div>';
+            chatBox.appendChild(loadingRow);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
                 const response = await fetch('/chat', {
@@ -236,40 +96,22 @@
                 });
                 
                 const data = await response.json();
-                typing.style.display = 'none';
+                chatBox.removeChild(loadingRow);
                 
                 if(response.ok) {
-                    appendMessage(data.reply, 'bot');
+                    chatBox.appendChild(createMessageElement(data.reply, false));
                 } else {
-                    appendMessage("Error: " + data.detail, 'bot');
+                    chatBox.appendChild(createMessageElement("Error: " + data.detail, false));
                 }
             } catch(e) {
-                typing.style.display = 'none';
-                appendMessage("서버와의 연결이 끊어졌습니다.", 'bot');
-            } finally {
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                userInput.focus();
-                scrollToBottom();
+                chatBox.removeChild(loadingRow);
+                chatBox.appendChild(createMessageElement("서버 문제 발생", false));
             }
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function handleEnter(e) {
-            if(e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-
-        // Auto-run the requested query when opened!
-        window.onload = function() {
-            userInput.focus();
-            setTimeout(() => {
-                userInput.value = "중국어 把구문의 어순에 대해 알려줘";
-                setTimeout(() => {
-                    sendMessage();
-                }, 400);
-            }, 600);
+            if(e.key === 'Enter') sendMessage();
         }
     </script>
 </body>

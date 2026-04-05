@@ -10,8 +10,13 @@ class AITutorModel:
         print("Model loaded successfully.")
 
     def generate_response(self, user_input: str) -> str:
+        system_prompt = (
+            "You are an expert Chinese grammar AI tutor. "
+            "First, directly answer the user's specific grammar question with clear explanations and examples. "
+            "Then, automatically provide an 'Additional Knowledge Expansion' (추가 지식 확장) section where you introduce a related advanced grammar pattern, native usage nuance, or similar vocabulary that connects to their question to deepen their understanding. Please answer in Korean."
+        )
         messages = [
-            {"role": "system", "content": "You are a friendly and helpful Chinese grammar AI tutor. You explain Chinese grammar simply and provide examples."},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_input}
         ]
         

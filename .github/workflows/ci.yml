@@ -9,9 +9,9 @@ on:
       - main
 
 jobs:
-  build-and-push:
-    name: Build and Push
-    runs-on: ubuntu-latest
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: self-hosted
     
     steps:
       - name: Checkout source code
@@ -35,24 +35,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-to-local:
-    name: Deploy to Self-hosted Runner
-    needs: build-and-push
-    if: github.event_name != 'pull_request'
-    runs-on: self-hosted
-    
-    steps:
-      - name: Pull latest Docker image
-        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chinese-grammar-tutor:latest
-        
-      - name: Stop running container (ignore if not running)
-        run: docker stop chinese-tutor-api || true
-        
-      - name: Remove old container (ignore if not exists)
-        run: docker rm chinese-tutor-api || true
-        
-      - name: Run new container on Local PC
+      - name: deploy to local Linux Server
+        if: github.event_name != 'pull_request'
         run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chinese-grammar-tutor:latest
+          docker stop chinese-tutor-api || true
+          docker rm chinese-tutor-api || true
           docker run -d \
             -p 8000:8000 \
             --name chinese-tutor-api \
